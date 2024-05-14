@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")  
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  HAHA
+  SAD
+  WOW
+  ANGRY
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  title     String
+  resume    String
+  content   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  Author       Admin         @relation(fields: [authorId], references: [id])
+  Reactions    Reactions[]
+  PostComments PostComment[]
+  Images       PostImages[]
+  PostViews    PostViews[]
+}
+
+model PostImages {
+  id     Int    @id @default(autoincrement())
+  postId Int
+  url    String
+
+  Post Post @relation(fields: [postId], references: [id])
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+
+  Posts        Post[]
+  User         User?
+  AdminSession AdminSession[]
+}
+
+model AdminSession {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  token     String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+
+  Admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Reactions {
+  id       Int          @id @default(autoincrement())
+  postId   Int
+  userId   Int
+  reaction ReactionType
+
+  Post Post @relation(fields: [postId], references: [id])
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model User {
+  id         Int     @id @default(autoincrement())
+  identifier String
+  lastName   String?
+  adminId    Int?    @unique
+  blockedBy  String?
+
+  Reactions    Reactions[]
+  PostComments PostComment[]  @relation(name: "PostComments")
+  Admin        Admin?         @relation(fields: [adminId], references: [id])
+  PostViews    PostViews[]
+  CommentReply CommentReply[]
+
+  @@unique([lastName, identifier])
+}
+
+model PostComment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+
+  User         User           @relation(fields: [userId], references: [id], name: "PostComments")
+  Post         Post           @relation(fields: [postId], references: [id])
+  CommentReply CommentReply[]
+}
+
+model CommentReply {
+  id        Int      @id @default(autoincrement())
+  commentId Int
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+
+  User    User        @relation(fields: [userId], references: [id])
+  Comment PostComment @relation(fields: [commentId], references: [id])
+}
+
+model PostViews {
+  id     Int @id @default(autoincrement())
+  postId Int
+  userId Int
+
+  Post Post @relation(fields: [postId], references: [id])
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
