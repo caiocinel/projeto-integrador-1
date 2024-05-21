@@ -54,7 +54,7 @@ export default async function Home() {
           <div className="container mx-auto px-6 py-3">
             <div className="flex items-center justify-between">            
               <div className="w-full text-gray-100 text-2xl font-semibold">
-                Brand
+                Studio Nanna Guiraldelli
               </div> 
               <button className="w-full text-gray-100 text-xs font-semibold">
                 <Link href={'/admin'} hidden={adm === null}>Gereciar</Link>

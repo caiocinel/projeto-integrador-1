@@ -38,7 +38,7 @@ model PostImages {
   postId Int
   url    String
 
-  Post Post @relation(fields: [postId], references: [id])
+  Post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Admin {
@@ -66,7 +66,7 @@ model Reactions {
   userId   Int
   reaction ReactionType
 
-  Post Post @relation(fields: [postId], references: [id])
+  Post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   User User @relation(fields: [userId], references: [id])
 
   @@unique([postId, userId])
@@ -96,7 +96,7 @@ model PostComment {
   createdAt DateTime @default(now())
 
   User         User           @relation(fields: [userId], references: [id], name: "PostComments")
-  Post         Post           @relation(fields: [postId], references: [id])
+  Post         Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
   CommentReply CommentReply[]
 }
 
@@ -116,7 +116,7 @@ model PostViews {
   postId Int
   userId Int
 
-  Post Post @relation(fields: [postId], references: [id])
+  Post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   User User @relation(fields: [userId], references: [id])
 
   @@unique([postId, userId])
